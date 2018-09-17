@@ -78,7 +78,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 break;
             case GET_MANY: {
                 const query = {
-                    where: {id: params.ids}
+                    where: JSON.stringify({id: params.ids})
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
