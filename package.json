@@ -22,6 +22,7 @@
         "watch": "rimraf ./lib && cross-env NODE_ENV=production babel --watch ./src -d ./lib --ignore spec.js,test.js"
     },
     "dependencies": {
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "query-string": "~5.1.1",
         "react-admin": "^2.3.1"
     },
