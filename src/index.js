@@ -18,7 +18,7 @@ import {
  * @example
  * GET_LIST     => GET http://my.api.url/posts?_sort=title%20ASC&skip=0&limit=24
  * GET_ONE      => GET http://my.api.url/posts/123
- * GET_MANY     => GET http://my.api.url/posts/123, GET http://my.api.url/posts/456, GET http://my.api.url/posts/789
+ * GET_MANY     => GET http://my.api.url/posts/?where={"id": [123,456,789]}
  * UPDATE       => PUT http://my.api.url/posts/123
  * CREATE       => POST http://my.api.url/posts/123
  * DELETE       => DELETE http://my.api.url/posts/123
@@ -55,10 +55,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 const query = {
                     ...fetchUtils.flattenObject(params.filter),
                     [params.target]: params.id,
-                    _sort: field,
-                    _order: order,
-                    _start: (page - 1) * perPage,
-                    _end: page * perPage,
+                    sort: `${field} ${order}`,
+                    skip: (page - 1) * perPage,
+                    limit: perPage
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
@@ -79,7 +78,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 break;
             case GET_MANY: {
                 const query = {
-                    [`id_like`]: params.ids.join('|'),
+                    where: {id: params.ids}
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
