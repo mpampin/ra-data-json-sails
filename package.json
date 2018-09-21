@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "babel-plugin-transform-object-rest-spread": "^6.26.0",
+        "lodash": "^4.17.11",
         "query-string": "~5.1.1",
         "react-admin": "^2.3.1"
     },

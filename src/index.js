@@ -11,6 +11,7 @@ import {
     DELETE,
     DELETE_MANY,
 } from 'react-admin';
+import _ from 'lodash';
 
 /**
  * Maps react-admin queries to a json-server powered REST API
@@ -77,8 +78,9 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 options.method = 'DELETE';
                 break;
             case GET_MANY: {
+                const idsToLookOut = _.map(params.ids, look => typeof look === "object" ? look.id : look);
                 const query = {
-                    where: JSON.stringify({id: params.ids})
+                    where: JSON.stringify({id: idsToLookOut})
                 };
                 url = `${apiUrl}/${resource}?${stringify(query)}`;
                 break;
