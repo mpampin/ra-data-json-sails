@@ -38,8 +38,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_LIST: {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
+                const where = _.mapValues(params.filter, (value, key) => {
+                    return key.endsWith("_id") || ["object","array"].includes(typeof value) 
+                        ? value : {contains: value}
+                })
                 const query = {
-                    ...fetchUtils.flattenObject(params.filter),
+                    where: JSON.stringify(where),
                     sort: `${field} ${order}`,
                     skip: (page - 1) * perPage,
                     limit: perPage,
