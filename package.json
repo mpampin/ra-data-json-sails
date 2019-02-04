@@ -1,6 +1,6 @@
 {
     "name": "ra-data-json-sails",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "Sails.js data provider for react-admin",
     "main": "lib/index.js",
     "module": "esm/index.js",
