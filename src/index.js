@@ -11,7 +11,26 @@ import {
     DELETE,
     DELETE_MANY,
 } from 'react-admin';
-import _ from 'lodash';
+import forEach from 'lodash/forEach';
+
+const convertToWaterline = (filters) => {
+
+    let where = {}
+    forEach(filters, (value, key) => {
+        if(key.endsWith("_id") || ["object","array"].includes(typeof value)) {
+            where[key] = value
+        } else {
+            const words = value.trim().split(" ")
+            if(words.length === 1) {
+                where[key] = { contains: words[0] }
+            } else {
+                where["and"] = words.map( word => ({[key]: {contains: word}}))
+            }
+        }        
+    })
+
+    return where
+}
 
 /**
  * Maps react-admin queries to a json-server powered REST API
@@ -38,10 +57,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_LIST: {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
-                const where = _.mapValues(params.filter, (value, key) => {
-                    return key.endsWith("_id") || ["object","array"].includes(typeof value) 
-                        ? value : {contains: value}
-                })
+                const where = convertToWaterline(params.filter)
                 const query = {
                     where: JSON.stringify(where),
                     sort: `${field} ${order}`,
