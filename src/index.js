@@ -17,7 +17,7 @@ const convertToWaterline = (filters) => {
 
     let where = {}
     forEach(filters, (value, key) => {
-        if(key.endsWith("_id") || ["object","array"].includes(typeof value)) {
+        if(key.endsWith("_id") || typeof value !== "string") {
             where[key] = value
         } else {
             const words = value.trim().split(" ")
