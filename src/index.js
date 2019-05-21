@@ -12,6 +12,7 @@ import {
     DELETE_MANY,
 } from 'react-admin';
 import forEach from 'lodash/forEach';
+import map from 'lodash/map';
 
 const convertToWaterline = (filters) => {
 
@@ -98,7 +99,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 options.method = 'DELETE';
                 break;
             case GET_MANY: {
-                const idsToLookOut = _.map(params.ids, look => typeof look === "object" ? look.id : look);
+                const idsToLookOut = map(params.ids, look => typeof look === "object" ? look.id : look);
                 const query = {
                     where: JSON.stringify({id: idsToLookOut})
                 };
