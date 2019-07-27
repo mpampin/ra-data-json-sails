@@ -13,6 +13,7 @@ import {
 } from 'react-admin';
 import forEach from 'lodash/forEach';
 import map from 'lodash/map';
+import has from 'lodash/has';
 
 const convertToWaterline = (filters) => {
 
@@ -58,9 +59,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_LIST: {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
-                const where = convertToWaterline(params.filter)
+                const { groupBy, count, max, ...filters} = params.filter;
+
+                const where = convertToWaterline(filters)
                 const query = {
                     where: JSON.stringify(where),
+                    groupBy,
+                    count,
+                    max,
                     sort: `${field} ${order}`,
                     skip: (page - 1) * perPage,
                     limit: perPage,
@@ -120,7 +126,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
      * @returns {Object} Data response
      */
     const convertHTTPResponse = (response, type, resource, params) => {
-        const { headers, json } = response;
+        let { headers, json } = response;
         switch (type) {
             case GET_LIST:
             case GET_MANY_REFERENCE:
@@ -129,6 +135,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                         'The X-Total-Count header is missing in the HTTP Response. The jsonServer Data Provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare X-Total-Count in the Access-Control-Expose-Headers header?'
                     );
                 }
+                if(Array.isArray(json) && !has(json[0],"id")) json = map(json, (item, ix) => ({
+                    id: ix,
+                    ...item
+                }));
                 return {
                     data: json,
                     total: parseInt(
