@@ -80,9 +80,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_MANY_REFERENCE: {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
+                const { groupBy, count, max, ...filters} = params.filter;
+                const where = convertToWaterline(filters)
+                where[params.target] = params.id
+
                 const query = {
-                    ...fetchUtils.flattenObject(params.filter),
-                    [params.target]: params.id,
+                    where: JSON.stringify(where),
+                    groupBy,
+                    count,
+                    max,
                     sort: `${field} ${order}`,
                     skip: (page - 1) * perPage,
                     limit: perPage
