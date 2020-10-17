@@ -11,28 +11,27 @@ import {
     DELETE,
     DELETE_MANY,
 } from 'react-admin';
-import forEach from 'lodash/forEach';
+import transform from 'lodash/transform';
 import map from 'lodash/map';
 import has from 'lodash/has';
 
-const convertToWaterline = (filters) => {
+const convertToWaterline = (filters) =>
+    transform(filters, (result, value, key) => {
 
-    let where = {}
-    forEach(filters, (value, key) => {
-        if(key.endsWith("_id") || typeof value !== "string") {
-            where[key] = value
-        } else {
+        if(typeof value === "string" && key.endsWith("%")) {
+            const keyWithoutSuffix = key.slice(0, -1)
             const words = value.trim().split(" ")
             if(words.length === 1) {
-                where[key] = { contains: words[0] }
+                result[keyWithoutSuffix] = { contains: words[0] }
             } else {
-                where["and"] = words.map( word => ({[key]: {contains: word}}))
+                result["and"] = words.map( word => ({[keyWithoutSuffix]: {contains: word}}))
             }
-        }        
-    })
+        } else {
+            result[key] = value
+        }
 
-    return where
-}
+        return result
+    }, {})
 
 /**
  * Maps react-admin queries to a json-server powered REST API
@@ -156,7 +155,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                     ),
                 };
             case CREATE:
-                return { data: { ...params.data, id: json.id } };
+                return { data: { ...params.data, ...json } };
             default:
                 return { data: json };
         }
